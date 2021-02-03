@@ -17,45 +17,103 @@ P.S. Здесь есть несколько вариантов решения з
 
 'use strict';
 
-// Возьмите свой код из предыдущей практики
+document.addEventListener('DOMContentLoaded',() =>{
 
-'use strict';
+const   advertisingBlock = document.querySelector('.promo__adv'),
+        advertisingImg = advertisingBlock.querySelectorAll('img'),
+        promoBg = document.querySelector('.promo__bg'),
+        genre = document.querySelector('.promo__genre'),
+        movieList = document.querySelector('.promo__interactive-list'),
+        addForm = document.querySelector('form.add'),
+        addInput = document.querySelector('.adding__input'),
+        checkbox = document.querySelector('[type="checkbox"]');
 
-const movieDB = {
-    movies: [
-        "Логан",
-        "Лига справедливости",
-        "Ла-ла лэнд",
-        "Одержимость",
-        "Скотт Пилигрим против..."
-    ]
-};
+    //работа с формой 
+    addForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        
+        let newFilm = addInput.value;
+        const favorite = checkbox.checked;
 
-const advertisingBlock = document.querySelector('.promo__adv');
-const advertisingImg = advertisingBlock.querySelectorAll('img');
-const promoBg = document.querySelector('.promo__bg');
-const genre = document.querySelector('.promo__genre');
-const movieList = document.querySelector('.promo__interactive-list');
+        if(newFilm){
+            if(newFilm.length > 21){
+                newFilm = `${newFilm.substring(0, 22)}...`;
+            }
+        
+        if(favorite){
+            alert('Добавили любимый фильм');
+        }    
 
-// 1
-for(let i = 0; i < advertisingImg.length; i++){
-    advertisingImg[i].remove();
-}
+        movieDB.movies.push(newFilm);
+        sortArr(movieDB.movies);
 
-// 2
-genre.innerHTML = 'драма';
+        createMovieList(movieDB.movies, movieList);
+        }
 
-// 3
-promoBg.style.backgroundImage = 'url("img/bg.jpg")'; 
+        
+        event.target.reset();
+    
+    });
 
-// 4
-movieList.innerHTML = "";
+    // база данных фильмов
+    const movieDB = {
+        movies: [
+            "Логан",
+            "Лига справедливости",
+            "Ла-ла лэнд",
+            "Одержимость",
+            "Скотт Пилигрим против...",
+            "TheMan"
+        ]
+    };
+        
+    // удаление рекламы
+    const deleteAdv = function (arr){
+        arr.forEach(item => {
+            item.remove();
+        });
+    };
+    
+    
+    // работа с станицей
+    const makeChanges = () => {
+        genre.innerHTML = 'драма';
+        promoBg.style.backgroundImage = 'url("img/bg.jpg")'; 
+    };
+    
+    // сортировка массива
+    const sortArr = (arr) => {
+        arr.sort();
+    };
+    
+    movieDB.movies.sort();
 
-movieDB.movies.sort();
+    // вывод списка фильмов на страницу из БД
+    function createMovieList (films, parent) {
+        parent.innerHTML = "";
 
-movieDB.movies.forEach((film, i) => {    
+        sortArr(films);
 
-    movieList.innerHTML += `<li class="promo__interactive-item">${i+1} ${film}
-                            <div class="delete"></div>
-                            </li>`;
+        films.forEach((film, i) => {    
+        parent.innerHTML += `<li class="promo__interactive-item">${i+1} ${film}<div class="delete"></div></li>`;
+        });
+
+        document.querySelectorAll('.delete').forEach((btn, i) =>{
+            btn.addEventListener('click', () => {
+                btn.parentElement.remove();
+                movieDB.movies.splice(i, 1);
+
+                createMovieList(films, parent);
+            });
+        });
+
+    }
+    
+    deleteAdv(advertisingImg);
+    makeChanges();    
+    createMovieList(movieDB.movies, movieList);
+
 });
+
+
+
